@@ -1,0 +1,30 @@
+---
+services:
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - AUTO_UPDATE=true #optional
+      - RUN_OPTS= #optional
+    volumes:
+      - /path/to/jackett/data:/config
+      - /path/to/blackhole:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+  
+  lets-a-go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lets-a-go
+    environment:
+      - ENV_VAR_NAME=value # Add your environment variables here
+    volumes:
+      - ./path/to/local/dir:/path/in/container
+    ports:
+      - "8080:8080" # Adjust the port mapping as needed
+    restart: unless-stopped

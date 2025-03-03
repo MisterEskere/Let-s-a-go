@@ -19,6 +19,11 @@ func main() {
 	apiURL := os.Getenv("JACKETT_API_URL")
 	apiKey := os.Getenv("JACKETT_API_KEY")
 
+	// Check if running inside a container
+	if os.Getenv("DOCKER") == "true" {
+		apiURL = "http://jackett:9117"
+	}
+
 	if apiURL == "" || apiKey == "" {
 		log.Fatal("JACKETT_API_URL and JACKETT_API_KEY environment variables are required")
 	}

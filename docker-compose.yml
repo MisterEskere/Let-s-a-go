@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     container_name: lets-a-go
     environment:
-      - ENV_VAR_NAME=value # Add your environment variables here
+      - DOCKER=true
     volumes:
       - ./path/to/local/dir:/path/in/container
     ports:

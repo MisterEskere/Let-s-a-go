@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/webtor-io/go-jackett"
@@ -9,6 +10,9 @@ import (
 
 func searchHandler(j *jackett.Jackett) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		log.Print("Request received")
+
 		ctx := r.Context()
 
 		query := r.URL.Query().Get("query")

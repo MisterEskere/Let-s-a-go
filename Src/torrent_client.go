@@ -27,15 +27,16 @@ func download_torrent() {
 
 	// Wait for torrent info to resolve
 	<-t.GotInfo()
+	print("\n")
 	fmt.Printf("Got torrent info: %s\n", t.Name())
 
 	// Start downloading all files
 	t.DownloadAll()
 
 	// Wait for download to finish
-	for {
-
+	for i := 0; i < 100; i++ {
+		fmt.Printf("Percent complete: %.2f%%\n", 100*float64(t.BytesCompleted())/float64(t.Length()))
 		time.Sleep(1 * time.Second)
-
+		i++
 	}
 }

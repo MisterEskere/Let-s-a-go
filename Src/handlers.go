@@ -42,26 +42,27 @@ func searchHandler(j *jackett.Jackett) http.HandlerFunc {
 func downloadHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Check that its a get request
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// Track down error
+	var err error
+
 	// Extract the Magnet
-	magnet := r.URL.Query().Get("magnet")
-	if magnet == "" {
-		http.Error(w, "Magnet parameter is required", http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
+	var body struct {
+		Magnet string `json:"magnet"`
+	}
+	if err = json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	magnet := body.Magnet
 
 	// Start the download
-	_, err := DownloadTorrent(magnet)
-	if err == nil {
-		http.Error(w, "Magnet parameter is required", http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
+	if _, err = DownloadTorrent(magnet); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

@@ -31,6 +31,9 @@ func DownloadTorrent(magnet string) (torrent *torrent.Torrent, err error) {
 		log.Print("Error adding the torrent")
 	}
 
+	// Wait for info before proceeding
+	<-torrent.GotInfo()
+
 	// Start downloading all files
 	torrent.DownloadAll()
 

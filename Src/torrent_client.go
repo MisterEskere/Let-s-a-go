@@ -1,42 +1,38 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"time"
 
 	"github.com/anacrolix/torrent"
 )
 
-func download_torrent() {
-	// Create client with default config
+var client *torrent.Client
+
+func InitClient() (err error) {
+	// Get Clients config
 	cfg := torrent.NewDefaultClientConfig()
 	cfg.DataDir = "./Torrents" // Where to download files
 
-	client, err := torrent.NewClient(cfg)
+	// Create the client
+	client, err = torrent.NewClient(cfg)
 	if err != nil {
-		log.Fatalf("Error creating client: %s", err)
+		log.Printf("Error creating client: %s", err)
+		return err
 	}
-	defer client.Close()
+
+	return nil
+}
+
+func DownloadTorrent(magnet string) (torrent *torrent.Torrent, err error) {
 
 	// Add a magnet link
-	t, err := client.AddMagnet("magnet:?xt=urn:btih:PVJBBJYRFEOXDAOW4B2M4XV5K3Z75XLA&dn=debian-12.10.0-amd64-netinst.iso&xl=663748608&tr=http%3A%2F%2Fbttracker.debian.org%3A6969%2Fannounce")
+	torrent, err = client.AddMagnet(magnet)
 	if err != nil {
-		log.Fatalf("Error adding magnet: %s", err)
+		log.Print("Error adding the torrent")
 	}
-
-	// Wait for torrent info to resolve
-	<-t.GotInfo()
-	print("\n")
-	fmt.Printf("Got torrent info: %s\n", t.Name())
 
 	// Start downloading all files
-	t.DownloadAll()
+	torrent.DownloadAll()
 
-	// Wait for download to finish
-	for i := 0; i < 100; i++ {
-		fmt.Printf("Percent complete: %.2f%%\n", 100*float64(t.BytesCompleted())/float64(t.Length()))
-		time.Sleep(1 * time.Second)
-		i++
-	}
+	return torrent, nil
 }

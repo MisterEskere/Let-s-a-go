@@ -37,3 +37,36 @@ func searchHandler(j *jackett.Jackett) http.HandlerFunc {
 		}
 	}
 }
+
+// Endpoint to download a magnet
+func downloadHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Check that its a get request
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract the Magnet
+	magnet := r.URL.Query().Get("magnet")
+	if magnet == "" {
+		http.Error(w, "Magnet parameter is required", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Start the download
+	_, err := DownloadTorrent(magnet)
+	if err == nil {
+		http.Error(w, "Magnet parameter is required", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// OK
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"status":"success"}`))
+}
